@@ -1,0 +1,34 @@
+﻿@model IEnumerable<MeetingScheduler.Models.Meeting>
+
+@{
+    ViewData["Title"] = "Meetings List";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var meeting in Model)
+        {
+            <tr>
+                <td>@meeting.Title</td>
+                <td>@meeting.Start</td>
+                <td>@meeting.End</td>
+                <td>@meeting.Description</td>
+                <td>
+                    <a href="@Url.Action("Edit", new { id = meeting.Id })" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="@Url.Action("Delete", new { id = meeting.Id })" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

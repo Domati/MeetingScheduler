@@ -3,6 +3,59 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                height: 750, // Wydłużenie kalendarza
+                initialView: 'timeGridWeek',
+                locale: 'pl',
+                slotDuration: '00:15:00', // Ustawia sloty na 15 minut
+                slotLabelInterval: '00:15:00',
+                slotMinTime: '10:00:00',
+                slotMaxTime: '19:30:00',
+                allDaySlot: false,
+                slotLabelFormat: {
+                    hour: '2-digit', // Format godziny (np. "02", "13")
+                    minute: '2-digit', // Format minuty (np. "00", "30")
+                    hour12: false // Użyj formatu 24-godzinnego
+                },
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                buttonText: {
+                    today: 'Dziś',
+                    month: 'Miesiąc',
+                    week: 'Tydzień',
+                    day: 'Dzień'
+                },
+                eventClick: function (info) {
+                    window.location.href = '/Reservations/Details/' + info.event.id;
+                },
+                eventSources: [
+                    {
+                        url: '/Meeting/GetEvents',
+                        method: 'GET',
+                        failure: function () {
+                            alert('Wystąpił błąd podczas pobierania rezerwacji!');
+                        },
+                    }
+                ]
+            });
+
+            calendar.render();
+        });
+    </script>
+    
+    <a class="btn btn-success btn-lg rounded-pill" asp-controller="Meeting" asp-action="Create">
+        Dodaj spotkanie
+    </a>
+
+
+    <div id="calendar"></div>
+
 </div>
