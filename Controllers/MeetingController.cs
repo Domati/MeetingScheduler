@@ -137,4 +137,84 @@ public class MeetingController : Controller
 
         return Json(events);
     }
+
+    //WGRYWANIE PLIKÓW CSV I JSON
+
+    public IActionResult Import()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult Import(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+        {
+            ModelState.AddModelError("", "Wybierz plik do importu.");
+            return View();
+        }
+
+        try
+        {
+            // Debugowanie, sprawdzanie nazwy pliku
+            Console.WriteLine($"Importing file: {file.FileName}");
+
+            if (file.FileName.EndsWith(".csv"))
+            {
+                var meetings = ImportFromCsv(file);
+                _context.Meetings.AddRange(meetings);
+            }
+            else if (file.FileName.EndsWith(".json"))
+            {
+                var meetings = ImportFromJson(file);
+                _context.Meetings.AddRange(meetings);
+            }
+            else
+            {
+                ModelState.AddModelError("", "Obsługiwane są tylko pliki CSV i JSON.");
+                return View();
+            }
+
+            _context.SaveChanges();
+            return RedirectToAction("Index");
+        }
+        catch (Exception ex)
+        {
+            // Złapanie wyjątku
+            Console.WriteLine($"Błąd importu: {ex.Message}");
+            ModelState.AddModelError("", $"Wystąpił błąd podczas importu: {ex.Message}");
+            return View();
+        }
+    }
+
+
+    private List<Meeting> ImportFromCsv(IFormFile file)
+    {
+        var meetings = new List<Meeting>();
+
+        using (var reader = new StreamReader(file.OpenReadStream()))
+        using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+        {
+            var records = csv.GetRecords<Meeting>().ToList();
+            meetings.AddRange(records);
+        }
+
+        return meetings;
+    }
+
+    private List<Meeting> ImportFromJson(IFormFile file)
+    {
+        var meetings = new List<Meeting>();
+
+        using (var reader = new StreamReader(file.OpenReadStream()))
+        {
+            var json = reader.ReadToEnd();
+            meetings = JsonConvert.DeserializeObject<List<Meeting>>(json);
+        }
+
+        return meetings;
+    }
+
+
 }
