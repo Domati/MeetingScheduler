@@ -1,3 +1,6 @@
+using MeetingScheduler.Data;
+using Microsoft.EntityFrameworkCore;
+
 namespace MeetingScheduler
 {
     public class Program
@@ -8,6 +11,12 @@ namespace MeetingScheduler
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))));
+
+
 
             var app = builder.Build();
 
